@@ -3,8 +3,8 @@
     "bundleVersion": 1,
     "commands": [
         {
-            "name": "💿 Linked Data exporter",
-            "identifier": "slde-script",
+            "name": "💿 Linked Data Importer",
+            "identifier": "linked-data-importer",
             "script": "./script.js",
             "handlers": {
                 "run": "onRun",
@@ -15,8 +15,8 @@
         }
     ],
     "menu": {
-        "title": "sketch-linked-data-exporter",
-        "items": ["slde-script"],
+        "title": "Linked Data Importer",
+        "items": ["linked-data-importer"],
         "isRoot": true
     },
     "icon": "icon.png"

@@ -1,0 +1,33 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 1,
+  "commands": [
+    {
+      "name": "💿 Linked Data Importer",
+      "identifier": "linked-data-importer",
+      "script": "__script.js",
+      "handlers": {
+        "run": "onRun",
+        "actions": {
+          "Shutdown": "onShutdown"
+        }
+      }
+    }
+  ],
+  "menu": {
+    "title": "Linked Data Importer",
+    "items": [
+      "linked-data-importer"
+    ],
+    "isRoot": true
+  },
+  "icon": "icon.png",
+  "version": "1.0.0",
+  "description": "Import CSV data as Linked Data-ready JSON file and images",
+  "name": "Linked Data Importer",
+  "identifier": "Linked Data Importer",
+  "disableCocoaScriptPreprocessor": true,
+  "appcast": "https://raw.githubusercontent.com/fbmore/linked-data-importer/master/.appcast.xml",
+  "author": "Francesco Bertocci",
+  "authorEmail": "fbmore@gmail.com"
+}

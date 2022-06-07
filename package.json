@@ -1,14 +1,14 @@
 {
-    "name": "sketch-linked-data-exporter",
-    "description": "Export selection as Linked Data-ready JSON file and images",
-    "version": "3.6.0",
+    "name": "linked-data-importer",
+    "description": "Import CSV data as Linked Data-ready JSON file and images",
+    "version": "1.0.0",
     "engines": {
         "sketch": ">=3.0"
     },
     "skpm": {
-        "name": "Linked Data exporter",
+        "name": "Linked Data Importer",
         "manifest": "src/manifest.json",
-        "main": "sketch-linked-data-exporter.sketchplugin",
+        "main": "Linked-Data-Importer.sketchplugin",
         "assets": [
             "assets/**/*"
         ],
@@ -40,9 +40,9 @@
         "sketch-module-web-view": "^3.1.4",
         "sort-object": "^3.0.3"
     },
-    "author": "Matteo Gratton <icona79@gmail.com>",
+    "author": "Francesco Bertocci <fbmore@gmail.com>",
     "repository": {
         "type": "git",
-        "url": "https://github.com/icona79/sketch-linked-data-exporter.git"
+        "url": "https://github.com/fbmore/linked-data-importer.git"
     }
 }

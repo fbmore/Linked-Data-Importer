@@ -1,4 +1,7 @@
 var sketch = require("sketch");
+
+var ui = require('sketch/ui');
+
 var DataSupplier = require("sketch/data-supplier");
 var document = sketch.getSelectedDocument();
 var selectedItem = document.selectedLayers.layers[0];
@@ -177,7 +180,51 @@ export default function () {
     if (data === undefined) {
         message("☝️ No symbol overrides found.");
     } else {
-        let json = JSON.stringify([data], null, 2);
+
+        /// hacking the JSON to test if the flow makes sense
+
+        let staticData = {"label": "Hello Francesco YAY 😀"}
+
+        /// add input to paste the CSV
+
+        var result = ""
+
+        var alertTitle = "Import Linked Data from a CSV";
+        var instructionalTextForInput = "👉 Paste CSV below:";
+        var initialValue = "name,email\nFrancesco,fbmore@gmail.com"
+      
+        //// Get user input
+        ui.getInputFromUser(
+          alertTitle,
+          {
+            initialValue: initialValue,
+            description: instructionalTextForInput,
+            numberOfLines: 10
+          },
+          (err, value) => {
+            if (err) {
+              // most likely the user canceled the input
+              return;
+            } else {
+              console.log(value);
+              result = value;
+            }
+          }
+        );
+      
+      
+        var goodQuotes = result.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
+      
+        // result = goodQuotes;
+        // var array = result.split("\n")
+
+        staticData = csvToJson(goodQuotes)
+
+        ///
+
+        let json = JSON.stringify(staticData, null, 2);
+        /// 
+        // let json = JSON.stringify([data], null, 2);
 
         if (json.length === 0) {
             sketch.UI.message("No data found.");
@@ -263,6 +310,40 @@ function normalizePaths(path) {
 
     return path;
 }
+
+/**
+ * Takes a raw CSV string and converts it to a JavaScript object.
+ * @param {string} text The raw CSV string.
+ * @param {string[]} headers An optional array of headers to use. If none are
+ * given, they are pulled from the first line of `text`.
+ * @param {string} quoteChar A character to use as the encapsulating character.
+ * @param {string} delimiter A character to use between columns.
+ * @returns {object[]} An array of JavaScript objects containing headers as keys
+ * and row entries as values.
+ */
+ function csvToJson(text, headers, quoteChar = '"', delimiter = ',') {
+    const regex = new RegExp(`\\s*(${quoteChar})?(.*?)\\1\\s*(?:${delimiter}|$)`, 'gs');
+  
+    const match = line => {
+      const matches = [...line.matchAll(regex)].map(m => m[2]);
+      matches.pop(); // cut off blank match at the end
+      return matches;
+    }
+  
+    const lines = text.split('\n');
+    const heads = headers ?? match(lines.shift());
+  
+    return lines.map(line => {
+      return match(line).reduce((acc, cur, i) => {
+        // Attempt to parse as a number; replace blank matches with `null`
+        const val = cur.length <= 0 ? null : Number(cur) || cur;
+        const key = heads[i] ?? `extra_${i}`;
+        return { ...acc, [key]: val };
+      }, {});
+    });
+  }
+  
+
 
 // **************************************
 // Object functions
