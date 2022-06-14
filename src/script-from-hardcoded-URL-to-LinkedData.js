@@ -216,7 +216,9 @@ export default function () {
                   alertTitle,
                   {
                     initialValue: initialValue,
-                    description: instructionalTextForInput                  },
+                    description: instructionalTextForInput,
+                    numberOfLines: 1
+                  },
                   (err, value) => {
                     if (err) {
                       // most likely the user canceled the input

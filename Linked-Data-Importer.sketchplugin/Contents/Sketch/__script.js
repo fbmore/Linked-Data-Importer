@@ -1003,8 +1003,9 @@ var ui = __webpack_require__(/*! sketch/ui */ "sketch/ui");
 
 var DataSupplier = __webpack_require__(/*! sketch/data-supplier */ "sketch/data-supplier");
 
-var document = sketch.getSelectedDocument();
-var selectedItem = document.selectedLayers.layers[0];
+var document = sketch.getSelectedDocument(); // var selectedItem = document.selectedLayers.layers[0];
+
+var selectedItemName = "Data-temp";
 var documentName = "data";
 
 if (document.path) {
@@ -1024,13 +1025,13 @@ var path = __webpack_require__(/*! path */ "path");
 
 var desktopDir = path.join(os.homedir(), "Desktop");
 var sketchDir = path.join(os.homedir(), "Library/Application Support/com.bohemiancoding.sketch3");
-var dataName = normalizePaths(selectedItem.name) + ".json";
+var dataName = normalizePaths(selectedItemName) + ".json";
 var sketchDataFolder = sketchDir + "/Linked-Data";
 createFolder(sketchDataFolder); // Setup the folder structure to export our data
 
 var dataFolder = sketchDataFolder + "/Data-" + documentName;
-var imagesFolder = dataFolder + "/Images-" + normalizePaths(selectedItem.name);
-var imagesFolderForJSON = "/Images-" + normalizePaths(selectedItem.name);
+var imagesFolder = dataFolder + "/Images-" + normalizePaths(selectedItemName);
+var imagesFolderForJSON = "/Images-" + normalizePaths(selectedItemName);
 createFolder(dataFolder);
 createFolder(imagesFolder);
 var exportOptions = {
@@ -1039,18 +1040,22 @@ var exportOptions = {
   output: imagesFolder
 };
 /* harmony default export */ __webpack_exports__["default"] = (function () {
-  var images = {};
-
-  if (document.selectedLayers.isEmpty) {
-    sketch.UI.message("Please select at least 1 layer.");
-    return;
-  } else if (document.selectedLayers > 1) {
-    sketch.UI.message("Please select maximum 1 layer.");
-    return;
-  } else if (selectedItem.type !== "Group" && selectedItem.type !== "SymbolInstance" && selectedItem.type !== "SymbolMaster") {
-    sketch.UI.message("Please select a Group, a Symbol Instance or a Symbol Source.");
-    return;
-  }
+  var images = {}; // if (document.selectedLayers.isEmpty) {
+  //     sketch.UI.message("Please select at least 1 layer.");
+  //     return;
+  // } else if (document.selectedLayers > 1) {
+  //     sketch.UI.message("Please select maximum 1 layer.");
+  //     return;
+  // } else if (
+  //     selectedItem.type !== "Group" &&
+  //     selectedItem.type !== "SymbolInstance" &&
+  //     selectedItem.type !== "SymbolMaster"
+  // ) {
+  //     sketch.UI.message(
+  //         "Please select a Group, a Symbol Instance or a Symbol Source."
+  //     );
+  //     return;
+  // }
 
   var json = [];
 
@@ -1193,31 +1198,71 @@ var exportOptions = {
   } else {
     /// hacking the JSON to test if the flow makes sense
     var staticData = {
-      "label": "Hello Francesco YAY 😀"
-    }; /// add input to paste the CSV
+      "label": "Hello Francesco! 😀"
+    }; //////// from REMOTE CSV TO JSON  
+    // Fetch the values for a given page within a Google Sheet
+    // Return the parse data
 
-    var result = "";
-    var alertTitle = "Import Linked Data from a CSV";
-    var instructionalTextForInput = "👉 Paste CSV below:";
-    var initialValue = "name,email\nFrancesco,fbmore@gmail.com"; //// Get user input
+    var queryURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcW7My8xoKPoHtFu8acMRNpreo7DLQPtvpSNit5g41ZorT2RTtHIg8-_7TqY10G04dXl0sjI-AwTbk/pub?output=tsv'; // staticData = fetchValuesFromRemoteFile(queryURL);
+    // console.log("fetchValuesFromRemoteFile")
+    // console.log(staticData)
+    // console.log("fetchValuesFromRemoteFile END")
+    /// Ask for Linked Data name
+
+    var linkedDataName = "Data";
+    var alertTitle = "Define a name for your Linked Data set";
+    var instructionalTextForInput = "Enter name like 'Cities-Data'";
+    var initialValue = "Cities-Data"; //// Get user input
 
     ui.getInputFromUser(alertTitle, {
       initialValue: initialValue,
-      description: instructionalTextForInput,
-      numberOfLines: 10
+      description: instructionalTextForInput
     }, function (err, value) {
       if (err) {
         // most likely the user canceled the input
         return;
       } else {
         console.log(value);
-        result = value;
+        linkedDataName = value;
       }
     });
-    var goodQuotes = result.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"'); // result = goodQuotes;
-    // var array = result.split("\n")
+    dataName = linkedDataName + ".json"; /// add input to paste the CSV
 
-    staticData = csvToJson(goodQuotes); ///
+    var result = "";
+    var alertTitle = "Import Linked Data";
+    var instructionalTextForInput = "👉 Paste URL to CSV or CSV below:";
+    var initialValue = queryURL; //JSON.stringify(staticData, null, 2);;
+    //"name,email\nFrancesco,fbmore@gmail.com"
+
+    if (1) {
+      //// Get user input
+      ui.getInputFromUser(alertTitle, {
+        initialValue: initialValue,
+        description: instructionalTextForInput,
+        numberOfLines: 10
+      }, function (err, value) {
+        if (err) {
+          // most likely the user canceled the input
+          return;
+        } else {
+          console.log(value);
+          result = value;
+        }
+      });
+    }
+
+    if (result.slice(0, 4) == "http") {
+      staticData = fetchValuesFromRemoteFile(result);
+      console.log("fetchValuesFromRemoteFile");
+      console.log(staticData);
+      console.log("fetchValuesFromRemoteFile END");
+    } else {
+      var goodQuotes = result.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
+      result = goodQuotes; //var array = result.split("\n")
+
+      staticData = csvToJson(goodQuotes);
+    } ///
+
 
     var _json = JSON.stringify(staticData, null, 2); /// 
     // let json = JSON.stringify([data], null, 2);
@@ -1236,8 +1281,8 @@ var exportOptions = {
       var _message = "The " + dataName + " dataset is now available in your Sketch data sources";
 
       _message += "\n";
-      _message += "From your Preferences modal -> Data, you can access the folder that contains it.";
-      sketch.UI.alert("Link Data extraction complete", _message);
+      _message += "Go to 'Preferences panel -> Data' to access the folder with the imported data.";
+      sketch.UI.alert("Linked Data import complete!", _message);
       var url = NSURL.fileURLWithPath(filePath);
       var dataManager = AppController.sharedInstance().dataSupplierManager();
 
@@ -1249,7 +1294,7 @@ var exportOptions = {
         }
       }
     } catch (error) {
-      sketch.UI.message("⛔️ There was an error writing your file on Desktop");
+      sketch.UI.message("⛔️ There was an error saving your file");
     }
   }
 }); // **************************************
@@ -1298,11 +1343,12 @@ function normalizePaths(path) {
  * @returns {object[]} An array of JavaScript objects containing headers as keys
  * and row entries as values.
  */
+//  function csvToJson(text, headers, quoteChar = '"', delimiter = ',') {
 
 
 function csvToJson(text, headers) {
   var quoteChar = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '"';
-  var delimiter = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ',';
+  var delimiter = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '	';
   var regex = new RegExp("\\s*(".concat(quoteChar, ")?(.*?)\\1\\s*(?:").concat(delimiter, "|$)"), 'gs');
 
   var match = function match(line) {
@@ -1329,7 +1375,99 @@ function csvToJson(text, headers) {
       });
     }, {});
   });
-} // **************************************
+} //////// from REMOTE CSV TO JSON  
+
+
+function fetchValuesFromRemoteFile(queryURL, staticData) {
+  // TSB is available and better for parsing - This URL is from Francesco's fbmore@gmail.com GDrive   
+  var request = NSMutableURLRequest.new();
+  request.setHTTPMethod('GET');
+  request.setURL(NSURL.URLWithString(queryURL));
+  var error = NSError.new();
+  var responseCode = null;
+  var response = NSURLConnection.sendSynchronousRequest_returningResponse_error(request, responseCode, error);
+  console.log(response);
+  var dataString = NSString.alloc().initWithData_encoding(response, NSUTF8StringEncoding).toString();
+  console.log("dataString");
+  console.log(dataString);
+  console.log("dataString END"); //// convert CSV to JSON
+
+  var goodQuotes = dataString.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"'); //var goodQuotes = dataString
+
+  staticData = csvToJson(goodQuotes);
+  console.log("static JSON Data");
+  console.log(staticData); //console.log(staticData.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"'))
+
+  console.log("static JSON Data END REPLACE"); ///
+
+  var json = JSON.stringify(staticData, null, 2);
+  console.log("json");
+  console.log(json); // var json = staticData
+
+  var obj = JSON.parse(json);
+  console.log("obj");
+  console.log(JSON.stringify(obj)); /// 
+  // let json = JSON.stringify([data], null, 2);
+
+  if (json.length === 0) {
+    sketch.UI.message("No data found.");
+    return;
+  } /////  
+
+
+  try {
+    //var data = JSON.parse(dataString)
+    // var data = JSON.parse(staticData)
+    var data = JSON.parse(JSON.stringify(obj));
+    console.log("data");
+    console.log(data); // return parseData(data)
+
+    return data;
+  } catch (e) {
+    sketch.UI.message("Failed to import file");
+    return null;
+  }
+} ////////
+// Parse the data to how we want it
+// function parseData(data) {
+//     var values = {}
+//     // data.feed.entry.forEach(function(entry) {
+//     //   Object.keys(entry).filter(function(key) {
+//     //     return key.indexOf('gsx$') == 0
+//     //   }).forEach(function(key) {
+//     //     var newKey = key.substring(4)
+//     //     if (!(values.hasOwnProperty(newKey))) {
+//     //       values[newKey] = []
+//     //     }
+//     //     var newValue = entry[key]['$t']
+//     //     if (newValue) {
+//     //       var currentArray = values[newKey]
+//     //       currentArray.push(newValue)
+//     //       values[newKey] = currentArray
+//     //     }
+//     //   })
+//     // })
+//     data.feed.entry.forEach(function(entry) {
+//       Object.keys(entry).forEach(function(key) {
+//         var newKey = key
+//         if (!(values.hasOwnProperty(newKey))) {
+//           values[newKey] = []
+//         }
+//         var newValue = entry[key]
+//         if (newValue) {
+//           var currentArray = values[newKey]
+//           currentArray.push(newValue)
+//           values[newKey] = currentArray
+//         }
+//       })
+//     })
+//     return {
+//       title: data.feed.title,
+//       values: values
+//     }
+//   }
+///////
+// **************************************
 // Object functions
 // **************************************
 

@@ -188,20 +188,6 @@ export default function () {
 
         var staticData = {"label": "Hello Francesco! 😀"}
 
-          
-//////// from REMOTE CSV TO JSON  
-
-// Fetch the values for a given page within a Google Sheet
-// Return the parse data
-
-    var queryURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcW7My8xoKPoHtFu8acMRNpreo7DLQPtvpSNit5g41ZorT2RTtHIg8-_7TqY10G04dXl0sjI-AwTbk/pub?output=tsv' 
-
-    // staticData = fetchValuesFromRemoteFile(queryURL);
-
-    // console.log("fetchValuesFromRemoteFile")
-    // console.log(staticData)
-    // console.log("fetchValuesFromRemoteFile END")
-
         /// Ask for Linked Data name
 
 
@@ -216,7 +202,9 @@ export default function () {
                   alertTitle,
                   {
                     initialValue: initialValue,
-                    description: instructionalTextForInput                  },
+                    description: instructionalTextForInput,
+                    numberOfLines: 1
+                  },
                   (err, value) => {
                     if (err) {
                       // most likely the user canceled the input
@@ -235,13 +223,10 @@ export default function () {
 
         var result = ""
 
-        var alertTitle = "Import Linked Data";
-        var instructionalTextForInput = "👉 Paste URL to CSV or CSV below:";
-        var initialValue = queryURL;
-        //JSON.stringify(staticData, null, 2);;
-        //"name,email\nFrancesco,fbmore@gmail.com"
+        var alertTitle = "Import Linked Data from a CSV";
+        var instructionalTextForInput = "👉 Paste CSV below:";
+        var initialValue = "name,email\nFrancesco,fbmore@gmail.com"
       
-        if (1){
         //// Get user input
         ui.getInputFromUser(
           alertTitle,
@@ -260,28 +245,15 @@ export default function () {
             }
           }
         );
-
-        }
       
-
-        if (result.slice(0,4) == "http"){
-            staticData = fetchValuesFromRemoteFile(result);
-
-            console.log("fetchValuesFromRemoteFile")
-            console.log(staticData)
-            console.log("fetchValuesFromRemoteFile END")
-    
-        } else {
-            var goodQuotes = result.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
       
-            result = goodQuotes;
-            //var array = result.split("\n")
-
-            staticData = csvToJson(goodQuotes)
-        }
-    
+        var goodQuotes = result.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"');
       
+        // result = goodQuotes;
+        // var array = result.split("\n")
+        
 
+        staticData = csvToJson(goodQuotes)
 
         ///
 
@@ -415,9 +387,17 @@ function normalizePaths(path) {
 
 
 
-
-
+  
 //////// from REMOTE CSV TO JSON  
+
+// Fetch the values for a given page within a Google Sheet
+// Return the parse data
+
+var queryURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcW7My8xoKPoHtFu8acMRNpreo7DLQPtvpSNit5g41ZorT2RTtHIg8-_7TqY10G04dXl0sjI-AwTbk/pub?output=tsv' 
+
+fetchValuesFromRemoteFile(queryURL);
+
+
 
 function fetchValuesFromRemoteFile(queryURL,staticData) {
 
@@ -478,14 +458,11 @@ console.log(JSON.stringify(obj))
 
   try {
     //var data = JSON.parse(dataString)
-    // var data = JSON.parse(staticData)
-
-    var data = JSON.parse(JSON.stringify(obj))
-    console.log("data")
+    var data = JSON.parse(staticData)
+    
     console.log(data)
     
-    // return parseData(data)
-    return data
+    return parseData(data)
 
   } catch(e) {
     sketch.UI.message("Failed to import file")
@@ -498,52 +475,6 @@ console.log(JSON.stringify(obj))
 
 
 ////////
-
-// Parse the data to how we want it
-// function parseData(data) {
-//     var values = {}
-  
-//     // data.feed.entry.forEach(function(entry) {
-//     //   Object.keys(entry).filter(function(key) {
-//     //     return key.indexOf('gsx$') == 0
-//     //   }).forEach(function(key) {
-//     //     var newKey = key.substring(4)
-//     //     if (!(values.hasOwnProperty(newKey))) {
-//     //       values[newKey] = []
-//     //     }
-  
-//     //     var newValue = entry[key]['$t']
-//     //     if (newValue) {
-//     //       var currentArray = values[newKey]
-//     //       currentArray.push(newValue)
-//     //       values[newKey] = currentArray
-//     //     }
-//     //   })
-//     // })
-//     data.feed.entry.forEach(function(entry) {
-//       Object.keys(entry).forEach(function(key) {
-//         var newKey = key
-//         if (!(values.hasOwnProperty(newKey))) {
-//           values[newKey] = []
-//         }
-  
-//         var newValue = entry[key]
-//         if (newValue) {
-//           var currentArray = values[newKey]
-//           currentArray.push(newValue)
-//           values[newKey] = currentArray
-//         }
-//       })
-//     })
-//     return {
-//       title: data.feed.title,
-//       values: values
-//     }
-//   }
-  
-
-
-///////
 
 
 // **************************************
