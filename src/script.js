@@ -405,7 +405,8 @@ function normalizePaths(path) {
         // Attempt to parse as a number; replace blank matches with `null`
         const val = cur.length <= 0 ? null : Number(cur) || cur;
         const key = heads[i] ?? `extra_${i}`;
-        return { ...acc, [key]: val };
+        //return { ...acc, [key]: val };
+        return { ...acc, [key]: val.toString() };
       }, {});
     });
   }

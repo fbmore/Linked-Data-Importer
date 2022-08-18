@@ -1369,9 +1369,10 @@ function csvToJson(text, headers) {
 
       // Attempt to parse as a number; replace blank matches with `null`
       var val = cur.length <= 0 ? null : Number(cur) || cur;
-      var key = (_heads$i = heads[i]) !== null && _heads$i !== void 0 ? _heads$i : "extra_".concat(i);
+      var key = (_heads$i = heads[i]) !== null && _heads$i !== void 0 ? _heads$i : "extra_".concat(i); //return { ...acc, [key]: val };
+
       return _objectSpread(_objectSpread({}, acc), {}, {
-        [key]: val
+        [key]: val.toString()
       });
     }, {});
   });
